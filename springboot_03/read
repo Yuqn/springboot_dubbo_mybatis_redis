@@ -1,0 +1,19 @@
+服务使用者
+一、创建项目
+    起步依赖：web
+二、添加依赖
+    同服务提供者一直
+三、写控制器类
+    注：@DubboReference(interfaceClass = FigureServer.class,version = "1.0")
+       private FigureServer figureServer;
+    @DubboReference使用注解获取远程接口
+四、添加注解@EnableDubbo
+    启动dubbo
+五、写配置文件
+    #??????
+    spring.application.name=consumer-application
+
+    #??????
+    dubbo.registry.address=zookeeper://localhost:2181
+
+    server.port=8081

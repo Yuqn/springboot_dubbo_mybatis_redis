@@ -1,0 +1,86 @@
+服务提供者
+一、创建项目
+    起步依赖：web、mysql、mybatis、redis
+二、添加依赖
+    添加dubbo依赖、zookeeper依赖、接口依赖
+    如下：
+        <!--接口层依赖-->
+        <dependency>
+            <groupId>com.yuqn</groupId>
+            <artifactId>springboot_01</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <!--添加dubbo依赖-->
+        <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo-spring-boot-starter</artifactId>
+            <version>2.7.8</version>
+        </dependency>
+        <!--添加zookeeper依赖-->
+        <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo-dependencies-zookeeper</artifactId>
+            <version>2.7.8</version>
+            <type>pom</type>
+            <!--排除日志重复加载依赖-->
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-log4j12</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+三、写业务层接口实现类
+    注：这里的接口实现类不是用@server注解，而是用注解@Component、@DubboService，来提供接口服务
+        在接口实现类上添加注解@Component、@DubboService(interfaceClass = StudentServer.class,version = "1.0",timeout = 5000)
+        @Component：存放到容器中，可省略
+        @DubboService：注解设置暴露接口设置
+            interfaceClass：表示暴露接口
+            version：版本号
+            timeout：请求时间
+四、写dao接口
+    注：需要在接口上面添加@Mapper注解自动注入，或者在启动类添加注解@MapperScan
+        （推荐使用第二种，比较方便）
+五、写mapper文件
+    一般写在resources下
+    注：（1）需要在配置文件中添加配置
+            mybatis.mapper-locations=classpath:mapper/*.xml
+       （2）需要写编译插件，用于resources下的mapper文件
+            <resources>
+                 <resource>
+                     <directory>src/main/resources</directory>
+                     <includes>
+                          <include>**/*.*</include>
+                     </includes>
+                 </resource>
+            </resources>
+六、写配置文件
+    写mybatis配置文件、写redis配置文件、写dubbo配置文件
+    如下：
+        #配置mysql连接
+        #注册驱动
+        spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+        #连接数据库
+        spring.datasource.url=jdbc:mysql://localhost:3306/springbootmybatis?serverTimezone=UTC&useUnicode=true&characterEncoding=utf8&useSSL=false
+        #账号
+        spring.datasource.username=root
+        #密码
+        spring.datasource.password=iamanidiot
+
+        #配置redis
+        spring.redis.host=39.108.141.205
+        spring.redis.port=6378
+        # spring.redis.password=密码
+
+        #配置dubbo
+        #配置服务名称
+        spring.application.name=studentserver-provider
+        #配置扫描的包，扫描的@dubboservice
+        dubbo.scan.base-packages=com.yuqn.service
+        #配置dubbo协议，如果使用zookeeper可以不用
+        #dubbo.protocol.name=dubbo
+        #dubbo.protocol.port=20881
+        #设置注册中心
+        dubbo.registry.address=zookeeper://localhost:2181
+七、添加dubbo注解
+    在启动类添加注解，启动dubbo
